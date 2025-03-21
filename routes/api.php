@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckController;
 use App\Http\Controllers\AdminApi\DoctorController;
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
 
 
@@ -27,4 +27,5 @@ Route::middleware('auth:api')->group(function () {
 
 
 
-Route::post('/adddoctor', [DoctorController::class, 'store']);
+// Route::post('/doctors', [DoctorController::class, 'store']);
+Route::apiResource('/doctors', DoctorController::class);

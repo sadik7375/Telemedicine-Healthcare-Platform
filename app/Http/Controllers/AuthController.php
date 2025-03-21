@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+Use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -9,30 +9,48 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    use App\Models\User;
-    use Illuminate\Http\Request;
-    use Illuminate\Support\Facades\Hash;
-    use Illuminate\Support\Facades\Validator;
+    
     
     public function register(Request $request)
     {
+    
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:6',
         ]);
     
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        // // If validation fails, return a structured error response
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Validation failed',
+        //         'errors' => $validator->errors()
+        //     ], 422);
+        // }
+    
+        try {
+            // Step 2: Create the user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password), 
+            ]);
+    
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User registered successfully',
+                'user' => $user
+            ], 201); 
+    
+        } catch (\Exception $e) {
+          
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User registration failed',
+                'error_details' => $e->getMessage() 
+            ], 500); 
         }
-    
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' =>$request->password,
-        ]);
-    
-        return response()->json(['message' => 'User registered successfully', 'user' => $user]);
     }
     
     public function login(Request $request)
